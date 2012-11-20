@@ -67,12 +67,11 @@ class list {
             this->tail = u;
             if (!this->head) {
                 this->head = u;
-                this->tail = u;
             }else{
                 node<T>* n = this->head;
-                if (!n) return;
                 while (n->next) n = n->next; 
                 n->next = u;
+                u->prev = n;
             }
             this->len++;
         }
@@ -89,39 +88,51 @@ class list {
                 throw("Invalid index");
             }
             node<T>* n = this->head;
-            for (int j = 0; j < index; j++) n = n->next;
+            for (int j = 0; j < index; j++) {
+                // cout << "  ["<< j << "] Moving to next:  " << n << endl;
+                n = n->next;
+            }
+            // cout << "Found index: " << index << ", node=" << n << endl;
             node<T>* t = n->prev;
             node<T>* u = n->next;
             if (u && t){
+                // cout << "next=" << t << ", prev=" << u << endl;
                 t->next = u;
                 u->prev = t;
             } else if (t){
+                // cout << "next=" << t << endl;
                 this->tail = t;
             } else if (u){
+                // cout << "prev=" << u << endl;
                 this->head = u;
             }
             delete n;
             this->len--;
         }
 
-        list<T>* slice(int* from, int* to){
-            from =  ((from == NULL) || (from < 0           )) ?            new int(0) : from;
-            to =    ((  to == NULL) || (  to > this->len)) ? new int(this->len) : to;
+        list<T>* slice(int from, int to){
+            from = (from < 0) ? 0 : from;
+            to = (to > this->len) ? this->len : to;
             list<T>* t = new list<T>();
-            for (int i = 0; i < this->len; i++){
-                if ((i > *from) && (i < *to)) t.append(this->get(i));
-                if (i > *to) break;
+            node<T>* n = this->head;
+            int i = 0;
+            while (n && (i < this->len)){
+                if ((from <= i) && (i <= to))
+                    t->append(*n->value);
+                n = n->next;
+                i++;
             }
+            return t;
         }
 
 };
 
 template <class T>
-ostream& operator<<(ostream &o, const list<T>& l) {
-    node<T>* t = l.head;
+ostream& operator<<(ostream &o, const list<T>* l) {
+    node<T>* t = l->head;
     o << "[";
     while (t){
-        o << *(t->value);
+        o << t;
         if (!t->next) break;
         o << ", ";
         t = t->next;
@@ -130,26 +141,36 @@ ostream& operator<<(ostream &o, const list<T>& l) {
     return o;
 };
 
+template <class T>
+ostream& operator<<(ostream &o, const node<T>* n) {
+    o << *(n->value);
+    return o;
+};
+
 template<typename T>
-list<T> merge_sort(list<T> coll){
-    if (coll.length() == 1){
+list<T>* merge_sort(list<T>* coll){
+    if (coll->length() == 1){
         return coll;
     }
-    list<T>* left, right, result;
-    cout << left << endl;
-    cout << right << endl;
-    left = merge_sort(left);
-    right = merge_sort(right);
+    // list<T>* left, right, result;
+    // cout << *left << endl;
+    // cout << right << endl;
+    // left = merge_sort(left);
+    // right = merge_sort(right);
     return coll;
 }
 
 int main(int argc, char** argv){
-    list<int> l;
+    list<int>* l = new list<int>();
     srand(time(NULL));
-    for (int i = 0; i < 10; i++) l.append(rand() % 10);
-    cout << l << endl;
+    for (int i = 0; i < 10; i++) l->append(rand() % 100);
+    cout << "Original:  " << l << endl; 
     l = merge_sort(l);
-    l.remove(0);
-    cout << l << endl;
+    // cout << "Calling lst->remove(" << (l->length()-2) << ")" << endl;
+    list<int> *l2 = l->slice(0,4);
+    cout << "Sorted:    " << l << endl;
+    cout << "Sliced:    " << l2 << endl;
+    delete l;
+    delete l2;
     return 0;
 }
