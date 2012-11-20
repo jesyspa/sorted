@@ -1,3 +1,7 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
 #include <iostream>
 #include <string>
 using namespace std;
@@ -35,10 +39,10 @@ class node {
 template<typename T>
 class list {
     private:
-        node<T>* head;
-        node<T>* tail;
         int len;
     public:
+        node<T>* head;
+        node<T>* tail;
         list(){
             this->len = 0;
             this->head = this->tail = 0;
@@ -86,14 +90,17 @@ class list {
             }
             node<T>* n = this->head;
             for (int j = 0; j < index; j++) n = n->next;
-            if (n->prev && n->next){
-                n->prev->next = n->next;
-                n->next->prev = n->prev;
-            } else if (n->prev){
-                this->tail = n->prev;
-            } else if (n->next){
-                this->head = n->prev;
+            node<T>* t = n->prev;
+            node<T>* u = n->next;
+            if (u && t){
+                t->next = u;
+                u->prev = t;
+            } else if (t){
+                this->tail = t;
+            } else if (u){
+                this->head = u;
             }
+            delete n;
             this->len--;
         }
 
@@ -107,16 +114,20 @@ class list {
             }
         }
 
-        ostream& operator<<(ostream &o, const list<T>& l) {
-            node<T>* t = l.head;
-            while (t){
-                strm << *(t->value);
-                if (!t->next) break;
-                strm << ", ";
-                t = t->next;
-            }
-            return strm;
-        }
+};
+
+template <class T>
+ostream& operator<<(ostream &o, const list<T>& l) {
+    node<T>* t = l.head;
+    o << "[";
+    while (t){
+        o << *(t->value);
+        if (!t->next) break;
+        o << ", ";
+        t = t->next;
+    }
+    o << "]";
+    return o;
 };
 
 template<typename T>
@@ -124,31 +135,20 @@ list<T> merge_sort(list<T> coll){
     if (coll.length() == 1){
         return coll;
     }
-    // list<T>* left, right, result;
-    // left = merge_sort(left);
-    // right = merge_sort(right);
-    // while ((left->length > 0) || (right->length > 0)){
-    //     if ((left->length > 0) && (right->length > 0)){
-    //         if (*(left->head->value) <= *(right->head->value)){
-    //             result.append(left.
-    //             left = rest(left)
-    //         }else{
-    //             append first(right) to result
-    //             right = rest(right)
-    //         }
-    //     }else if (left->length > 0) {
-    //     }else if (right->length > 0) {
-    //     }
-    // }
+    list<T>* left, right, result;
+    cout << left << endl;
+    cout << right << endl;
+    left = merge_sort(left);
+    right = merge_sort(right);
     return coll;
 }
 
 int main(int argc, char** argv){
     list<int> l;
-    l.append(5);
-    l.append(6);
-    cout << l.get(0) << endl;
+    srand(time(NULL));
+    for (int i = 0; i < 10; i++) l.append(rand() % 10);
     cout << l << endl;
+    l = merge_sort(l);
     l.remove(0);
     cout << l << endl;
     return 0;
