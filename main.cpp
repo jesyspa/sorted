@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
 template<typename T>
@@ -36,10 +37,10 @@ class list {
     private:
         node<T>* head;
         node<T>* tail;
-        int length;
+        int len;
     public:
         list(){
-            this->length = 0;
+            this->len = 0;
             this->head = this->tail = 0;
         }
         ~list(){
@@ -53,12 +54,12 @@ class list {
             }
         }
 
-        int get_length(){
-            return this->length;
+        int length(){
+            return this->len;
         }
 
-        void push(const T& t){
-            node<T>* u = new node<T>(t, this->length);
+        void append(const T& t){
+            node<T>* u = new node<T>(t, this->len);
             this->tail = u;
             if (!this->head) {
                 this->head = u;
@@ -69,50 +70,86 @@ class list {
                 while (n->next) n = n->next; 
                 n->next = u;
             }
-            this->length++;
+            this->len++;
         }
 
         T get(const int index){
             node<T>* n = this->head;
-            if (index > this->length) throw("Invalid Index!");
+            if (index > this->len) throw("Invalid Index!");
             while (n->pos < index) n = n->next;
             return *(n->value);
         }
 
-        T pop(){
-            if (!this->tail) throw("Invalid Operation:  No value to return.");
-            if (!this->tail->prev) return *(this->tail->value);
-            this->tail = this->tail->prev;
-            return *(this->tail->value);
+        void remove(const int& index){
+            if ((index < 0) || (index > this->len)){
+                throw("Invalid index");
+            }
+            node<T>* n = this->head;
+            for (int j = 0; j < index; j++) n = n->next;
+            if (n->prev && n->next){
+                n->prev->next = n->next;
+                n->next->prev = n->prev;
+            } else if (n->prev){
+                this->tail = n->prev;
+            } else if (n->next){
+                this->head = n->prev;
+            }
+            this->len--;
         }
 
         list<T>* slice(int* from, int* to){
-            from =  ((from == NULL) || (from < 0         )) ? new int(0)               : from;
-            to =    ((  to == NULL) || (to > this->length)) ? new int(this->length)    : to;
+            from =  ((from == NULL) || (from < 0           )) ?            new int(0) : from;
+            to =    ((  to == NULL) || (  to > this->len)) ? new int(this->len) : to;
             list<T>* t = new list<T>();
-            for (int i = 0; i < this->length; i++){
-                if ((i > from) && (i < to))
-                    t.push(this->get(i));
-                else if (i > to) break;
+            for (int i = 0; i < this->len; i++){
+                if ((i > *from) && (i < *to)) t.append(this->get(i));
+                if (i > *to) break;
             }
         }
 
+        ostream& operator<<(ostream &o, const list<T>& l) {
+            node<T>* t = l.head;
+            while (t){
+                strm << *(t->value);
+                if (!t->next) break;
+                strm << ", ";
+                t = t->next;
+            }
+            return strm;
+        }
 };
 
 template<typename T>
-list<T>* merge_sort(list<T>* coll){
-    if (coll->get_length() == 1){
+list<T> merge_sort(list<T> coll){
+    if (coll.length() == 1){
         return coll;
     }
-    list<T>* left, right;
-    left = coll->slice(coll->
+    // list<T>* left, right, result;
+    // left = merge_sort(left);
+    // right = merge_sort(right);
+    // while ((left->length > 0) || (right->length > 0)){
+    //     if ((left->length > 0) && (right->length > 0)){
+    //         if (*(left->head->value) <= *(right->head->value)){
+    //             result.append(left.
+    //             left = rest(left)
+    //         }else{
+    //             append first(right) to result
+    //             right = rest(right)
+    //         }
+    //     }else if (left->length > 0) {
+    //     }else if (right->length > 0) {
+    //     }
+    // }
+    return coll;
 }
 
 int main(int argc, char** argv){
-    list<int>* l = new list<int>();
-    l->push(5);
-    cout << l->get(0) << endl;
-    cout << l->get_length() << endl;
-    delete l;
+    list<int> l;
+    l.append(5);
+    l.append(6);
+    cout << l.get(0) << endl;
+    cout << l << endl;
+    l.remove(0);
+    cout << l << endl;
     return 0;
 }
