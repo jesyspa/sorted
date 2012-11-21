@@ -116,15 +116,12 @@ namespace sorted {
                 list<T> result;
                 node<T> *n = this->head;
                 int idx = 0;
-                printf("from=%d, to=%d\n", from, to);
                 while (n && (idx < this->len)){
                     if ((from <= idx) && (idx <= to)) result.append(n->value);
                     if (idx > to) break;
-                    cout << "slicing (" << idx << "):  " << result << endl;
                     n = n->next;
                     idx++;
                 }
-                cout << result << endl;
                 return result;
             }
 
@@ -167,11 +164,10 @@ namespace sorted {
 
     template<typename T>
     list<T> merge_sort(list<T> original){
-        cout << original << endl;
         if (original.length() == 1) return original;
         int len = original.length();
         list<T> result = original.slice(0,(len/2));
-        cout << "Slice:  " << result << endl;
+        cout << "Slice:     " << result << endl;
         return result;
     }
 
@@ -183,6 +179,6 @@ int main(int argc, char** argv){
     for (int i = 0; i < 10; i++) l.append(rand() % 100);
     cout << "Original:  " << l << endl; 
     l = sorted::merge_sort(l);
-    cout << l << endl;
+    cout << "Sorted:    " << l << endl;
     return 0;
 }
