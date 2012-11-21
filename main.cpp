@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <sstream>
 #include <iostream>
 #include <string>
 using namespace std;
@@ -110,37 +111,61 @@ class list {
             this->len--;
         }
 
-        list<T>* slice(int from, int to){
+        list<T> slice(int from, int to){
             from = (from < 0) ? 0 : from;
             to = (to > this->len) ? this->len : to;
-            list<T>* t = new list<T>();
-            node<T>* n = this->head;
-            int i = 0;
-            while (n && (i < this->len)){
-                if ((from <= i) && (i <= to))
-                    t->append(*n->value);
+            list<T> result;
+            node<T> *n = this->head;
+            int idx = 0;
+            printf("from=%d, to=%d\n", from, to);
+            while (n && (idx < this->len)){
+                if ((from <= idx) && (idx <= to)){
+                    result.append(*(n->value));
+                }else if (idx > to){
+                    break;
+                }
+                cout << "slicing (" << idx << "):  " << result << endl;
                 n = n->next;
-                i++;
+                idx++;
             }
-            return t;
+            return result;
         }
 
+        string dump(){
+            node<T>* t = this->head;
+            string d = "";
+            d += "[";
+            while (t){
+                ostringstream convert;
+                convert << *(t->value);
+                string s = convert.str();
+                convert.flush();
+                d += s;
+                if (!t->next) break;
+                d += ", ";
+                t = t->next;
+            }
+            d += "]";
+            return d;
+        }
 };
 
 template <class T>
-ostream& operator<<(ostream &o, const list<T>* l) {
-    node<T>* t = l->head;
-    o << "[";
-    while (t){
-        o << t;
-        if (!t->next) break;
-        o << ", ";
-        t = t->next;
-    }
-    o << "]";
+ostream& operator<<(ostream &o, list<T>& l) {
+    o << l.dump();
+    return o;
+};
+template <class T>
+ostream& operator<<(ostream &o, list<T>* l) {
+    o << l->dump();
     return o;
 };
 
+template <class T>
+ostream& operator<<(ostream &o, const node<T>& n) {
+    o << n.value;
+    return o;
+};
 template <class T>
 ostream& operator<<(ostream &o, const node<T>* n) {
     o << *(n->value);
@@ -152,11 +177,14 @@ list<T>* merge_sort(list<T>* coll){
     if (coll->length() == 1){
         return coll;
     }
-    // list<T>* left, right, result;
-    // cout << *left << endl;
-    // cout << right << endl;
-    // left = merge_sort(left);
-    // right = merge_sort(right);
+    list<T> left, right, result;
+    int len = coll->length();
+    left = coll->slice(0,(len/2));
+    right = coll->slice((len/2)+1,len);
+    string t = left.dump();
+    cout << "Left:  " << t << endl;
+    t = right.dump();
+    cout << "Right:  " << t << endl;
     return coll;
 }
 
@@ -166,11 +194,7 @@ int main(int argc, char** argv){
     for (int i = 0; i < 10; i++) l->append(rand() % 100);
     cout << "Original:  " << l << endl; 
     l = merge_sort(l);
-    // cout << "Calling lst->remove(" << (l->length()-2) << ")" << endl;
-    list<int> *l2 = l->slice(0,4);
-    cout << "Sorted:    " << l << endl;
-    cout << "Sliced:    " << l2 << endl;
+    list<int> l2 = l->slice(0,4);
     delete l;
-    delete l2;
     return 0;
 }
