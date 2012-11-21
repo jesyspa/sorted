@@ -2,10 +2,11 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <sstream>
 #include <iostream>
 #include <string>
 using namespace std;
+
+#include <boost/lexical_cast.hpp>
 
 template<typename T>
 class node {
@@ -35,12 +36,7 @@ class node {
         }
 
         string dump(){
-            string s;
-            ostringstream convert;
-            convert << this->value;
-            s = convert.str();
-            convert.flush();
-            return s;
+            return boost::lexical_cast<std::string>(this->value);
         }
 
     private:
@@ -120,11 +116,8 @@ class list {
             int idx = 0;
             printf("from=%d, to=%d\n", from, to);
             while (n && (idx < this->len)){
-                if ((from <= idx) && (idx <= to)){
-                    result.append(n->value);
-                }else if (idx > to){
-                    break;
-                }
+                if ((from <= idx) && (idx <= to)) result.append(n->value);
+                if (idx > to) break;
                 cout << "slicing (" << idx << "):  " << result << endl;
                 n = n->next;
                 idx++;
