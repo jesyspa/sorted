@@ -12,26 +12,35 @@ class node {
     public:
 
         int pos;
-        T* value;
+        T value;
         node<T>* next;
         node<T>* prev;
 
         node(const T& t){
         	this->next = NULL;
         	this->prev = NULL;
-        	this->value = new T(t);
+        	this->value = T(t);
             this->pos = -1;
         }
 
         node(const T& t, int pos){
         	this->next = NULL;
         	this->prev = NULL;
-        	this->value = new T(t);
+        	this->value = T(t);
             this->pos = pos;
         }
 
         ~node(){
-            if (this->value) delete this->value;
+            /* pass */
+        }
+
+        string dump(){
+            string s;
+            ostringstream convert;
+            convert << this->value;
+            s = convert.str();
+            convert.flush();
+            return s;
         }
 
     private:
@@ -42,6 +51,7 @@ class list {
     private:
         int len;
     public:
+
         node<T>* head;
         node<T>* tail;
         list(){
@@ -81,30 +91,21 @@ class list {
             node<T>* n = this->head;
             if (index > this->len) throw("Invalid Index!");
             while (n->pos < index) n = n->next;
-            return *(n->value);
+            return T(n->value);
         }
 
         void remove(const int& index){
-            if ((index < 0) || (index > this->len)){
-                throw("Invalid index");
-            }
+            if ((index < 0) || (index > this->len)) throw("Invalid index");
             node<T>* n = this->head;
-            for (int j = 0; j < index; j++) {
-                // cout << "  ["<< j << "] Moving to next:  " << n << endl;
-                n = n->next;
-            }
-            // cout << "Found index: " << index << ", node=" << n << endl;
+            for (int j = 0; j < index; j++) n = n->next;
             node<T>* t = n->prev;
             node<T>* u = n->next;
             if (u && t){
-                // cout << "next=" << t << ", prev=" << u << endl;
                 t->next = u;
                 u->prev = t;
             } else if (t){
-                // cout << "next=" << t << endl;
                 this->tail = t;
             } else if (u){
-                // cout << "prev=" << u << endl;
                 this->head = u;
             }
             delete n;
@@ -120,7 +121,7 @@ class list {
             printf("from=%d, to=%d\n", from, to);
             while (n && (idx < this->len)){
                 if ((from <= idx) && (idx <= to)){
-                    result.append(*(n->value));
+                    result.append(n->value);
                 }else if (idx > to){
                     break;
                 }
@@ -128,6 +129,7 @@ class list {
                 n = n->next;
                 idx++;
             }
+            cout << result << endl;
             return result;
         }
 
@@ -136,11 +138,7 @@ class list {
             string d = "";
             d += "[";
             while (t){
-                ostringstream convert;
-                convert << *(t->value);
-                string s = convert.str();
-                convert.flush();
-                d += s;
+                d += t->dump();
                 if (!t->next) break;
                 d += ", ";
                 t = t->next;
@@ -163,38 +161,31 @@ ostream& operator<<(ostream &o, list<T>* l) {
 
 template <class T>
 ostream& operator<<(ostream &o, const node<T>& n) {
-    o << n.value;
+    o << n.dump();
     return o;
 };
 template <class T>
 ostream& operator<<(ostream &o, const node<T>* n) {
-    o << *(n->value);
+    o << n->dump();
     return o;
 };
 
 template<typename T>
-list<T>* merge_sort(list<T>* coll){
-    if (coll->length() == 1){
-        return coll;
-    }
-    list<T> left, right, result;
-    int len = coll->length();
-    left = coll->slice(0,(len/2));
-    right = coll->slice((len/2)+1,len);
-    string t = left.dump();
-    cout << "Left:  " << t << endl;
-    t = right.dump();
-    cout << "Right:  " << t << endl;
-    return coll;
+list<T> merge_sort(list<T> original){
+    cout << original << endl;
+    if (original.length() == 1) return original;
+    int len = original.length();
+    list<T> result = original.slice(0,(len/2));
+    cout << "Slice:  " << result << endl;
+    return result;
 }
 
 int main(int argc, char** argv){
-    list<int>* l = new list<int>();
+    list<int> l;
     srand(time(NULL));
-    for (int i = 0; i < 10; i++) l->append(rand() % 100);
+    for (int i = 0; i < 10; i++) l.append(rand() % 100);
     cout << "Original:  " << l << endl; 
     l = merge_sort(l);
-    list<int> l2 = l->slice(0,4);
-    delete l;
+    cout << l << endl;
     return 0;
 }
