@@ -221,8 +221,8 @@ namespace sorted {
             left = original->slice(0,(len/2));
             right = original->slice((len/2)+1,len-1);
         }else if (len == 2){
-            left = (list<T>*)original->slice(0,0);
-            right = (list<T>*)original->slice(1,1);
+            left = original->slice(0,0);
+            right = original->slice(1,1);
         }
         left = merge_sort(left);
         right = merge_sort(right);
