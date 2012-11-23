@@ -14,30 +14,18 @@ namespace sorted {
     class node {
         public:
 
-            int pos;
             T value;
             node<T>* next;
             node<T>* prev;
 
             node(const node<T>* t){
+                this->value = T(t->value);
             }
 
             node(const T& t){
                 this->next = NULL;
                 this->prev = NULL;
                 this->value = T(t);
-                this->pos = -1;
-            }
-
-            node(const T& t, int pos){
-                this->next = NULL;
-                this->prev = NULL;
-                this->value = T(t);
-                this->pos = pos;
-            }
-
-            ~node(){
-                /* pass */
             }
 
             string dump(){
@@ -65,12 +53,6 @@ namespace sorted {
                 node<T>* t = NULL;
                 while (n){
                     t = n->next;
-                    if (!n) {
-                        cout << "list<T>::~list() > n already deleted !!!" << endl;
-                        return;
-                    } else {
-                        cout << "list<T>::~list() > delete n:  " << n->value << endl;
-                    }
                     delete n;
                     n = t;
                 }
@@ -81,7 +63,7 @@ namespace sorted {
             }
 
             void append(const T& t){
-                node<T>* u = new node<T>(t, this->len);
+            	node<T>* u = new node<T>(t);
                 this->tail = u;
                 if (!this->head) {
                     this->head = u;
@@ -90,14 +72,19 @@ namespace sorted {
                     while (n->next) n = n->next; 
                     n->next = u;
                     u->prev = n;
+                    this->tail = u;
                 }
                 this->len++;
             }
 
-            T get(const int index){
+            T get(const int idx_req){
                 node<T>* n = this->head;
-                if (index > this->len) throw("Invalid Index!");
-                while (n->pos < index) n = n->next;
+                if ((idx_req > this->len) || (idx_req < 0)) throw("Invalid Index!");
+                int idx = 0;
+                while (idx < idx_req) {
+                    n = n->next;
+                    idx++;
+                }
                 return T(n->value);
             }
 
@@ -109,21 +96,25 @@ namespace sorted {
                 }
                 node<T>* n = this->head;
                 for (int j = 0; j < index; j++) n = n->next;
-                printf("Removing index=%d, len=%d, ", index, this->len);
-                cout << "value: " << n << endl;
                 node<T>* t = n->prev;
                 node<T>* u = n->next;
                 if (u && t){
                     t->next = u;
                     u->prev = t;
                 } else if (t){
+                    t->next = NULL;
                     this->tail = t;
                 } else if (u){
+                    u->prev = NULL;
                     this->head = u;
-                }
-                cout << "list<T>::remove() > Deleting n" << endl;
+                } 
                 delete n;
                 this->len--;
+                if (this->len == 0) this->head = this->tail = NULL;
+                if (this->len == 1) {
+                    if (u) this->head = this->tail = u;
+                    else if (t) this->head = this->tail = t;
+                }
             }
 
             list<T>* slice(int from, int to){
@@ -156,10 +147,8 @@ namespace sorted {
             }
 
             list<T>& operator= (const list<T>& rhs){
-                long result_addr = (long)&rhs;
                 node<T>* n = rhs.head;
                 while (n->next) {
-                    cout << n->value << endl;
                     this->append(T(n->value));
                     n = n->next;
                 }
@@ -204,55 +193,67 @@ namespace sorted {
                     result->append(r);
                     right->remove(0);
                 }
-            } else if (left->length() > 0){
+                continue;
+            }
+
+            if (left->length() > 0) {
                 result->append(left->get(0));
                 left->remove(0);
-            } else if (right->length() > 0){
+            }
+
+            if (right->length() > 0) {
                 result->append(right->get(0));
                 right->remove(0);
             }
         }
-        cout << "Deleting left:  " << left << endl;
-        delete left;
-        cout << "Deleting right:  " << right << endl;
-        delete right;
         return result;
     }
 
     template<typename T>
     list<T>* merge_sort(list<T>* original){
-        if (original->length() == 1) return original;
+        if (original->length() <= 1) {
+            return original;
+        }
         int len = original->length();
-        list<T>* left = new list<T>();
-        list<T>* right = new list<T>();
+        list<T>* left = NULL;
+        list<T>* right = NULL;
         if (len > 2){
             left = original->slice(0,(len/2));
             right = original->slice((len/2)+1,len-1);
         }else if (len == 2){
-            left = original->slice(0,0);
-            right = original->slice(1,1);
+            left = (list<T>*)original->slice(0,0);
+            right = (list<T>*)original->slice(1,1);
         }
-        cout << "Left:  " << left << endl;
-        cout << "Right:  " << left << endl;
         left = merge_sort(left);
         right = merge_sort(right);
-        return merge(left, right);
+        delete original;
+        list<T>* result = merge(left, right);
+        delete left;
+        delete right;
+        return result;
     }
 }
 
 sorted::list<int>* get_random_list(){
     sorted::list<int>* l = new sorted::list<int>();
     srand(time(NULL));
-    for (int i = 0; i < 10; i++) l->append(rand() % 100);
+    for (int i = 0; i < 10000; i++) l->append(rand() % 1000);
     return l;
 }
 
 int main(int argc, char** argv){
     sorted::list<int>* l = get_random_list();
-    cout << "Original:     " << l << endl; 
-    sorted::list<int>* l_after_sort = sorted::merge_sort(l);
-    cout << "Sorted:       " << l_after_sort << endl;
+    l = merge_sort(l);
+    for (int i = 0; i < (l->length() - 1); i++){
+        int t = l->get(i);
+        int u = l->get(i+1); 
+        if (t > u){
+            sorted::list<int>* m = l->slice(i - 5, i + 5);
+            cout << m << endl;
+            delete m;
+            break;
+        }
+    }
     delete l;
-    delete l_after_sort;
     return 0;
 }
