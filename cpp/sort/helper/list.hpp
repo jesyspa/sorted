@@ -33,21 +33,22 @@ namespace helper {
                 }
             }
 
+            // O(n) = constant time, or O(1) as n gets bigger
             int length(){
                 return this->len;
             }
 
+            // O(n) = constant time, or O(1) as n gets bigger
             void append(const T& t){
             	helper::node<T>* u = new helper::node<T>(t);
-                this->tail = u;
                 if (!this->head) {
                     this->head = u;
-                }else{
-                    helper::node<T>* n = this->head;
-                    while (n->next) n = n->next; 
-                    n->next = u;
-                    u->prev = n;
                     this->tail = u;
+                }else {
+                    helper::node<T>* v = this->tail;
+                    this->tail = u;
+                    v->next = u;
+                    u->prev = v;
                 }
                 this->len++;
             }
@@ -92,6 +93,11 @@ namespace helper {
                 }
             }
 
+            /* 
+                best case: slice of original list at the beginning, taking constant time
+                avg case: linear growth, as n gets larger:  O(n) 
+                worst case:  still linear growth
+            */
             list<T>* slice(int from, int to){
                 from = (from < 0) ? 0 : from;
                 to = (to > this->len) ? this->len : to;

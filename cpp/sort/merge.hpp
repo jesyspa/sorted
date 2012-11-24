@@ -1,7 +1,14 @@
+
+#ifndef MERGE_HPP
+#define MERGE_HPP
+
+#include <stdlib.h>             /* srand()  */
+#include <time.h>               /* time()   */
 #include "helper/list.hpp"
 
 namespace sorted {
 
+    // O(n), this method will grow in run-time linearly, as n gets bigger
     template<typename T>
     helper::list<T>* merge(helper::list<T>* left, helper::list<T>* right){
         helper::list<T>* result = new helper::list<T>();
@@ -18,12 +25,10 @@ namespace sorted {
                 }
                 continue;
             }
-
             if (left->length() > 0) {
                 result->append(left->get(0));
                 left->remove(0);
             }
-
             if (right->length() > 0) {
                 result->append(right->get(0));
                 right->remove(0);
@@ -34,18 +39,17 @@ namespace sorted {
 
     template<typename T>
     helper::list<T>* merge_sort(helper::list<T>* original){
-        if (original->length() <= 1) {
-            return original;
-        }
         int len = original->length();
         helper::list<T>* left = NULL;
         helper::list<T>* right = NULL;
-        if (len > 2){
-            left = original->slice(0,(len/2));
-            right = original->slice((len/2)+1,len-1);
-        }else if (len == 2){
+        if (len < 2){
+            return original;
+        } else if (len == 2){
             left = original->slice(0,0);
             right = original->slice(1,1);
+        } else if (len > 2){
+            left = original->slice(0,(len/2));
+            right = original->slice((len/2)+1,len-1);
         }
         left = merge_sort(left);
         right = merge_sort(right);
@@ -56,6 +60,9 @@ namespace sorted {
         return result;
     }
 
+    /*
+        O(n) - linear growth as input size grows
+    */
     helper::list<int>* get_random_list(int count, int base){
         helper::list<int>* l = new helper::list<int>();
         srand(time(NULL));
@@ -64,3 +71,4 @@ namespace sorted {
     }
 }
 
+#endif
