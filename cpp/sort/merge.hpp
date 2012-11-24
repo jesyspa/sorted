@@ -37,6 +37,11 @@ namespace sorted {
         return result;
     }
 
+    // the complexity of this method depends on the complexity of 
+    // both slice and merge operations.  Slicing takes n^2/2 as 
+    // n gets bigger, and merging grows linearly as n gets bigger
+    // so we take the larger and call that the complexity of this
+    // method:  n^2/2
     template<typename T>
     helper::list<T>* merge_sort(helper::list<T>* original){
         int len = original->length();
