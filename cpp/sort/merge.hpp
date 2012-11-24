@@ -3,8 +3,8 @@
 namespace sorted {
 
     template<typename T>
-    list<T>* merge(list<T>* left, list<T>* right){
-        list<T>* result = new list<T>();
+    helper::list<T>* merge(helper::list<T>* left, helper::list<T>* right){
+        helper::list<T>* result = new helper::list<T>();
         while ((left->length() > 0) || (right->length() > 0)){
             if ((left->length() > 0) && (right->length() > 0)){
                 T l = left->get(0);
@@ -33,13 +33,13 @@ namespace sorted {
     }
 
     template<typename T>
-    list<T>* merge_sort(list<T>* original){
+    helper::list<T>* merge_sort(helper::list<T>* original){
         if (original->length() <= 1) {
             return original;
         }
         int len = original->length();
-        list<T>* left = NULL;
-        list<T>* right = NULL;
+        helper::list<T>* left = NULL;
+        helper::list<T>* right = NULL;
         if (len > 2){
             left = original->slice(0,(len/2));
             right = original->slice((len/2)+1,len-1);
@@ -50,14 +50,14 @@ namespace sorted {
         left = merge_sort(left);
         right = merge_sort(right);
         delete original;
-        list<T>* result = merge(left, right);
+        helper::list<T>* result = merge(left, right);
         delete left;
         delete right;
         return result;
     }
 
-    list<int>* get_random_int_list(int count, int base){
-        sorted::list<int>* l = new sorted::list<int>();
+    helper::list<int>* get_random_list(int count, int base){
+        helper::list<int>* l = new helper::list<int>();
         srand(time(NULL));
         for (int i = 0; i < count; i++) l->append(rand() % base);
         return l;

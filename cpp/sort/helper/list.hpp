@@ -1,6 +1,7 @@
 #ifndef HELPER__LIST_H
 #define HELPER__LIST_H
 
+#include "node.hpp"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -15,16 +16,16 @@ namespace helper {
             int len;
         public:
 
-            node<T>* head;
-            node<T>* tail;
+            helper::node<T>* head;
+            helper::node<T>* tail;
             list(){
                 this->len = 0;
                 this->head = this->tail = NULL;
             }
             ~list(){
-                node<T>* n = this->head;
+                helper::node<T>* n = this->head;
                 if (!n) return;
-                node<T>* t = NULL;
+                helper::node<T>* t = NULL;
                 while (n){
                     t = n->next;
                     delete n;
@@ -37,12 +38,12 @@ namespace helper {
             }
 
             void append(const T& t){
-            	node<T>* u = new node<T>(t);
+            	helper::node<T>* u = new helper::node<T>(t);
                 this->tail = u;
                 if (!this->head) {
                     this->head = u;
                 }else{
-                    node<T>* n = this->head;
+                    helper::node<T>* n = this->head;
                     while (n->next) n = n->next; 
                     n->next = u;
                     u->prev = n;
@@ -52,7 +53,7 @@ namespace helper {
             }
 
             T get(const int idx_req){
-                node<T>* n = this->head;
+                helper::node<T>* n = this->head;
                 if ((idx_req > this->len) || (idx_req < 0)) throw("Invalid Index!");
                 int idx = 0;
                 while (idx < idx_req) {
@@ -68,10 +69,10 @@ namespace helper {
                     return;
                 } else {
                 }
-                node<T>* n = this->head;
+                helper::node<T>* n = this->head;
                 for (int j = 0; j < index; j++) n = n->next;
-                node<T>* t = n->prev;
-                node<T>* u = n->next;
+                helper::node<T>* t = n->prev;
+                helper::node<T>* u = n->next;
                 if (u && t){
                     t->next = u;
                     u->prev = t;
@@ -95,7 +96,7 @@ namespace helper {
                 from = (from < 0) ? 0 : from;
                 to = (to > this->len) ? this->len : to;
                 list<T>* result = new list<T>();
-                node<T> *n = this->head;
+                helper::node<T> *n = this->head;
                 int idx = 0;
                 while (n && (idx < this->len)){
                     if ((from <= idx) && (idx <= to)) result->append(n->value);
@@ -107,7 +108,7 @@ namespace helper {
             }
 
             string dump(){
-                node<T>* t = this->head;
+                helper::node<T>* t = this->head;
                 string d = "";
                 d += "[";
                 while (t){
@@ -121,7 +122,7 @@ namespace helper {
             }
 
             list<T>& operator= (const list<T>& rhs){
-                node<T>* n = rhs.head;
+                helper::node<T>* n = rhs.head;
                 while (n->next) {
                     this->append(T(n->value));
                     n = n->next;

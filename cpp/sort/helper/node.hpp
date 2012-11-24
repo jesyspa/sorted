@@ -7,7 +7,7 @@ using namespace std;
 
 #include <boost/lexical_cast.hpp>
 
-namespace sorted {
+namespace helper {
 
     template<typename T>
     class node {
