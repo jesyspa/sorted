@@ -60,32 +60,20 @@ namespace sorted {
 
         std::vector<T> left;
         std::vector<T> right;
-        typename std::vector<T>::const_iterator first;
-        typename std::vector<T>::const_iterator last;
-
-        unsigned int start, end;
 
         if (in.size() > 2){
-            end = len / 2;
-            first = in.begin();
-            last = in.begin() + end;
-            left = std::vector<T>(first, last);
-
-            start = (len / 2) + 1;
-            end = len-1;
-            first = in.begin() + start;
-            last = in.begin() + end;
-            right = std::vector<T>(first, last);
-
+            left = std::vector<T>(in.begin(), in.begin() + (len / 2));
+            right = std::vector<T>(in.begin() + ((len / 2) + 1) , in.begin() + (len - 1));
         } else {
-            left.push_back(in.front());
-            right.push_back(in.back());
+            left = std::vector<T>(in[0]);
+            right = std::vector<T>(in[1]);
         }
+        cout << "left=" << left << ", right=" << right << endl;
 
         left = merge_sort(left);
         right = merge_sort(right);
 
-        vector<T> out = merge(left,right);
+        std::vector<T> out = merge(left,right);
         return out;
     }
 
