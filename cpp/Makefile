@@ -3,10 +3,10 @@
 all: clean main
 
 test: all 
-	valgrind ./main.bin
+	valgrind ./bin
 
 main:
-	g++ -g -Wall main.cpp -o bin
+	g++ -g -Wall -Wextra -Werror -pedantic -std=c++11 main.cpp -o bin
 
 clean:
 	rm bin *.o -f
