@@ -1,22 +1,23 @@
-
 #ifndef MERGE_HPP
 #define MERGE_HPP
 
 #include <vector>
-#include <stdlib.h>             /* srand()  */
-#include <time.h>               /* time()   */
+#include <utility>
+#include <cstdlib>             /* srand()  */
+#include <ctime>               /* time()   */
 
 // I'm surprized this doesn't already exist.  Or, 
 // more likey, I'm doing this wrong.  lol.  
-template <class T>
-ostream& operator<<(ostream &o, vector<T> v) {
+template <typename T>
+std::ostream& operator<<(std::ostream& o, std::vector<T> const& v) {
     unsigned int i = 0;
     o << "[";
-    for (i=0; i < v.size(); i++) {
-        o << v[i];
-        if (i < v.size() - 1) {
-            o << ", ";  
-        }
+    bool first = true;
+    for (auto const& e : v) {
+        if (!first)
+            o << ", ";
+        o << e;
+        first = false;
     }
     o << "]";
     return o;
@@ -24,23 +25,26 @@ ostream& operator<<(ostream &o, vector<T> v) {
 
 namespace sorted {
 
+    // This could better be done with iterator ranges.
+    // Also, vectors aren't the best data structure to use within the sort; a deque would
+    // offer better performance.  I suspect this might not really be O(n*log(n))
     template<typename T>
-    vector<T> merge(vector<T> left, vector<T> right){
-        vector<T> result;
+    std::vector<T> merge(std::vector<T> left, std::vector<T> right) {
+        std::vector<T> result;
         result.reserve(left.size() + right.size());
-        while (left.size() || right.size()){
-            if (left.size() && right.size()){
-                if (left.front() <= right.front()){
+        while (left.size() || right.size()) {
+            if (left.size() && right.size()) {
+                if (left.front() <= right.front()) {
                     result.push_back(left.front());
                     left.erase(left.begin());
                 } else {
                     result.push_back(right.front());
                     right.erase(right.begin());
                 }
-            }else if (!left.empty()){
+            } else if (!left.empty()) {
                 result.push_back(left.front());
                 left.erase(left.begin());
-            }else if (!right.empty()){
+            } else if (!right.empty()) {
                 result.push_back(right.front());
                 right.erase(right.begin());
             }
@@ -59,24 +63,25 @@ namespace sorted {
 
         if (in.size() > 2){
             left = std::vector<T>(in.begin(), in.begin() + (len / 2));
-            right = std::vector<T>(in.begin() + (len / 2), in.begin() + len);
+            right = std::vector<T>(in.begin() + (len / 2), in.end());
         } else {
             left.push_back(in[0]);
             right.push_back(in[1]);
         }
 
-        left = merge_sort(left);
-        right = merge_sort(right);
+        left = merge_sort(std::move(left));
+        right = merge_sort(std::move(right));
 
-        std::vector<T> out = merge(left,right);
+        std::vector<T> out = merge(std::move(left), std::move(right));
         return out;
     }
 
-    std::vector<int> get_random_vector(int count, int base){
-        std::vector<int> array(count);
-        srand(time(NULL));
-        for (int i = 0; i < count; i++) array[i] = rand() % base;
-        return array;
+    std::vector<int> get_random_vector(int count, int base) {
+        std::vector<int> v(count);
+        // Why not use the C++11 facilities?
+        for (auto& e : v)
+            e = rand() % base;
+        return v;
     }
 }
 
