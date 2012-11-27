@@ -6,6 +6,8 @@
 #include <stdlib.h>             /* srand()  */
 #include <time.h>               /* time()   */
 
+// I'm surprized this doesn't already exist.  Or, 
+// more likey, I'm doing this wrong.  lol.  
 template <class T>
 ostream& operator<<(ostream &o, vector<T> v) {
     unsigned int i = 0;
@@ -22,32 +24,27 @@ ostream& operator<<(ostream &o, vector<T> v) {
 
 namespace sorted {
 
-
     template<typename T>
     vector<T> merge(vector<T> left, vector<T> right){
         vector<T> result;
         result.reserve(left.size() + right.size());
-        cout << "left=" << left << ", right=" << right << endl;
         while (left.size() || right.size()){
             if (left.size() && right.size()){
                 if (left.front() <= right.front()){
-                    cout << "Pushing " << left.front() << endl;
                     result.push_back(left.front());
                     left.erase(left.begin());
                 } else {
-                    cout << "Pushing " << right.front() << endl;
                     result.push_back(right.front());
                     right.erase(right.begin());
                 }
-            }else if (right.empty()){
+            }else if (!left.empty()){
                 result.push_back(left.front());
                 left.erase(left.begin());
-            }else if (left.empty()){
+            }else if (!right.empty()){
                 result.push_back(right.front());
                 right.erase(right.begin());
             }
         }
-        cout << "result:  " << result << endl;
         return result;
     }
 
@@ -58,17 +55,15 @@ namespace sorted {
 
         if (len < 2) return in;
 
-        std::vector<T> left;
-        std::vector<T> right;
+        std::vector<T> left, right;
 
         if (in.size() > 2){
             left = std::vector<T>(in.begin(), in.begin() + (len / 2));
-            right = std::vector<T>(in.begin() + ((len / 2) + 1) , in.begin() + (len - 1));
+            right = std::vector<T>(in.begin() + (len / 2), in.begin() + len);
         } else {
-            left = std::vector<T>(in[0]);
-            right = std::vector<T>(in[1]);
+            left.push_back(in[0]);
+            right.push_back(in[1]);
         }
-        cout << "left=" << left << ", right=" << right << endl;
 
         left = merge_sort(left);
         right = merge_sort(right);
@@ -76,7 +71,6 @@ namespace sorted {
         std::vector<T> out = merge(left,right);
         return out;
     }
-
 
     std::vector<int> get_random_vector(int count, int base){
         std::vector<int> array(count);
