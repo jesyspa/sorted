@@ -2,82 +2,99 @@
 #ifndef MERGE_HPP
 #define MERGE_HPP
 
+#include <vector>
 #include <stdlib.h>             /* srand()  */
 #include <time.h>               /* time()   */
-#include "helper/list.hpp"
+
+template <class T>
+ostream& operator<<(ostream &o, vector<T> v) {
+    unsigned int i = 0;
+    o << "[";
+    for (i=0; i < v.size(); i++) {
+        o << v[i];
+        if (i < v.size() - 1) {
+            o << ", ";  
+        }
+    }
+    o << "]";
+    return o;
+};
 
 namespace sorted {
 
-    // O(n), this method will grow in run-time linearly, as n gets bigger
+
     template<typename T>
-    helper::list<T>* merge(helper::list<T>* left, helper::list<T>* right){
-        helper::list<T>* result = new helper::list<T>();
-        while ((left->length() > 0) || (right->length() > 0)){
-            if ((left->length() > 0) && (right->length() > 0)){
-                T l = left->get(0);
-                T r = right->get(0);
-                if (l <= r){
-                    result->append(l);
-                    left->remove(0);
-                } else{
-                    result->append(r);
-                    right->remove(0);
+    vector<T> merge(vector<T> left, vector<T> right){
+        vector<T> result;
+        result.reserve(left.size() + right.size());
+        cout << "left=" << left << ", right=" << right << endl;
+        while (left.size() || right.size()){
+            if (left.size() && right.size()){
+                if (left.front() <= right.front()){
+                    cout << "Pushing " << left.front() << endl;
+                    result.push_back(left.front());
+                    left.erase(left.begin());
+                } else {
+                    cout << "Pushing " << right.front() << endl;
+                    result.push_back(right.front());
+                    right.erase(right.begin());
                 }
-                continue;
-            }
-            if (left->length() > 0) {
-                result->append(left->get(0));
-                left->remove(0);
-            }
-            if (right->length() > 0) {
-                result->append(right->get(0));
-                right->remove(0);
+            }else if (right.empty()){
+                result.push_back(left.front());
+                left.erase(left.begin());
+            }else if (left.empty()){
+                result.push_back(right.front());
+                right.erase(right.begin());
             }
         }
+        cout << "result:  " << result << endl;
         return result;
     }
 
-    // the complexity of this method depends on the complexity of 
-    // both slice and merge operations.  Slicing is O(n*log n) 
-    // and merging grows linearly which is O(n).  
-    //
-    // Conclusion:  merge_sort is O(n + n*log n) which boils
-    // down to O(n*log n) 
-    //
-    // for an explanation of how dividing the problem in half
-    // each time turns into log-based-two of n, see the following
-    // article:  http://www.crsr.net/Notes/BigO.html
     template<typename T>
-    helper::list<T>* merge_sort(helper::list<T>* original){
-        int len = original->length();
-        helper::list<T>* left = NULL;
-        helper::list<T>* right = NULL;
-        if (len < 2){
-            return original;
-        } else if (len == 2){
-            left = original->slice(0,0);
-            right = original->slice(1,1);
-        } else if (len > 2){
-            left = original->slice(0,(len/2));
-            right = original->slice((len/2)+1,len-1);
+    std::vector<T> merge_sort(std::vector<T> in){
+
+        size_t len = in.size();
+
+        if (len < 2) return in;
+
+        std::vector<T> left;
+        std::vector<T> right;
+        typename std::vector<T>::const_iterator first;
+        typename std::vector<T>::const_iterator last;
+
+        unsigned int start, end;
+
+        if (in.size() > 2){
+            end = len / 2;
+            first = in.begin();
+            last = in.begin() + end;
+            left = std::vector<T>(first, last);
+
+            start = (len / 2) + 1;
+            end = len-1;
+            first = in.begin() + start;
+            last = in.begin() + end;
+            right = std::vector<T>(first, last);
+
+        } else {
+            left.push_back(in.front());
+            right.push_back(in.back());
         }
+
         left = merge_sort(left);
         right = merge_sort(right);
-        delete original;
-        helper::list<T>* result = merge(left, right);
-        delete left;
-        delete right;
-        return result;
+
+        vector<T> out = merge(left,right);
+        return out;
     }
 
-    /*
-        O(n) - linear growth as input size grows
-    */
-    helper::list<int>* get_random_list(int count, int base){
-        helper::list<int>* l = new helper::list<int>();
+
+    std::vector<int> get_random_vector(int count, int base){
+        std::vector<int> array(count);
         srand(time(NULL));
-        for (int i = 0; i < count; i++) l->append(rand() % base);
-        return l;
+        for (int i = 0; i < count; i++) array[i] = rand() % base;
+        return array;
     }
 }
 
