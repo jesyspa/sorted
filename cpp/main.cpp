@@ -1,26 +1,26 @@
-#include <iostream>
-#include <exception>
-using namespace std;
-
 #include "sort/merge.hpp"
 
+#include <iostream>
+#include <exception>
+
 int main(int argc, char** argv){
-
-    vector<int> v;
-
-    try{
+    std::vector<int> v;
+    
+    // What can this throw?
+    try {
         v = sorted::get_random_vector(10, 100);
-        cout << "Unsorted:  " << v << endl;
-    }catch(exception& e){
-        cerr << "get_random_vector(int count,int base) ERROR:  " << e.what() << endl;
+        std::cout << "Unsorted:  " << v << std::endl;
+    } catch(std::exception& e) {
+        std::cerr << "get_random_vector(int count,int base) ERROR:  " << e.what() << std::endl;
         return -1;
     }
 
-    try{
-        vector<int> v_sorted = sorted::merge_sort(v);
-        cout << "Sorted:    " << v_sorted << endl;
-    }catch(exception& e){
-        cerr << "Merge Sort ERROR:  " << e.what() << endl;
+    // Why are you still trying to sort even when you know you don't have a vector?
+    try {
+        auto v_sorted = sorted::merge_sort(v);
+        std::cout << "Sorted:    " << v_sorted << std::endl;
+    } catch(exception& e) {
+        std::cerr << "Merge Sort ERROR:  " << e.what() << std::endl;
         return -1;
     }
 
